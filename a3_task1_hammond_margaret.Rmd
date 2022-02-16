@@ -1,0 +1,69 @@
+---
+title: "beepboop"
+output: html_document
+name: 'Margaret Hammond'
+theme: 'yeti'
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(here)
+library(janitor)
+library(tidyverse)
+library(ggfortify)
+library(palmerpenguins)
+library(patchwork)
+library(paletteer)
+```
+
+
+A useful descriptive introductory summary (3 - 4 sentences) that helps the audience understand the data (include a citation as necessary) and what you’ll be exploring
+All of your organized and well-annotated code (with warnings/messages suppressed) you wrote to wrangle data then run PCA, and to create a professional looking PCA biplot that appears (with a caption) in your knitted HTML (optional: also include a nicely formatted screeplot)
+A brief summary (nicely formatted and professionally written bulletpoints are fine) highlighting some major takeaways from your PCA that can be gleaned from the biplot (and screeplot, if included). 
+
+
+
+```{r}
+nutrients <- read_csv(here('data', 'usda_nutrients.csv')) %>% 
+  clean_names() %>% 
+    filter(food_group %in% c('Dairy and Egg Products', 'Fast Foods', 'Nut and Seed Products', 'Snacks', 'Vegetable and Vegetable Products'))
+
+nutrients_pca <- nutrients %>% 
+  select(energy_kcal, protein_g, fat_g, carb_g) %>% 
+  scale() %>% 
+  prcomp()
+```
+
+## Biplot
+
+```{r}
+ 
+ 
+autoplot(nutrients_pca,
+         data = nutrients,
+         loadings = TRUE,
+         colour = "food_group",
+         loadings.label = TRUE,
+         loadings.colour = 'black',
+         loadings.label.colour = 'black',
+         loadings.label.vjust = -0.5) +
+  scale_color_manual(values = c('blue', 'purple', 'orange', 'red', 'green')) +
+  scale_fill_manual(values = c()) +
+  theme_minimal()
+```
+
+```{r}
+autoplot(nutrients_pca,
+         data = nutrients,
+         loadings = TRUE,
+         colour = 'food_group',
+         loadings.label = TRUE,
+         loadings.colour = 'black',
+         loadings.label.colour = 'black',
+         loadings.label.vjust = -0.5) +
+  scale_color_paletteer_d('nord::aurora') +
+  theme_minimal()
+```
+
+### Citation
+ U.S. Department of Agriculture, Agricultural Research Service. FoodData Central, 2019. fdc.nal.usda.gov.
