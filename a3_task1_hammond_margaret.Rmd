@@ -1,12 +1,15 @@
 ---
-title: "beepboop"
-output: html_document
-name: 'Margaret Hammond'
-theme: 'yeti'
+title: "PCA Analysis of Food Group Nutrient Content"
+author: 'Margaret Hammond'
+date: '2/16/2022'
+output: 
+  html_document:
+    theme: flatly
+    code_folding: hide
 ---
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+```{r setup, include=FALSE, message = FALSE, warning = FALSE}
+knitr::opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
 library(here)
 library(janitor)
 library(tidyverse)
@@ -16,28 +19,31 @@ library(patchwork)
 library(paletteer)
 ```
 
-
-A useful descriptive introductory summary (3 - 4 sentences) that helps the audience understand the data (include a citation as necessary) and what you’ll be exploring
-All of your organized and well-annotated code (with warnings/messages suppressed) you wrote to wrangle data then run PCA, and to create a professional looking PCA biplot that appears (with a caption) in your knitted HTML (optional: also include a nicely formatted screeplot)
-A brief summary (nicely formatted and professionally written bulletpoints are fine) highlighting some major takeaways from your PCA that can be gleaned from the biplot (and screeplot, if included). 
+### Summary
+In this task, I am using the USDA food nutrients data (USDA 2019) to create a PCA analysis of energy (kcal), protein (g), fat (g), and carb(g) levels in the following food groups: dairy and egg products, fast foods, nut and seed products, snacks, and vegetable and vegetable products. This PCA will show dependent variables relationship on multiple dimensions, and where the food groups fall based on this relationship. 
 
 
+
+### Wrangle the Data
+Read in the data and wrangle it so that there are 5 food groups and 4 dependent variables we can analyze. 
 
 ```{r}
 nutrients <- read_csv(here('data', 'usda_nutrients.csv')) %>% 
   clean_names() %>% 
-    filter(food_group %in% c('Dairy and Egg Products', 'Fast Foods', 'Nut and Seed Products', 'Snacks', 'Vegetable and Vegetable Products'))
+    filter(food_group %in% c('Dairy and Egg Products', 'Fast Foods', 'Nut and Seed Products', 'Snacks', 'Vegetable and Vegetable Products')) ### chose these as my independent variables
 
 nutrients_pca <- nutrients %>% 
-  select(energy_kcal, protein_g, fat_g, carb_g) %>% 
-  scale() %>% 
+  select(energy_kcal, protein_g, fat_g, carb_g)  %>% ### chose these as my dependent variables
+  scale() %>% ### scale so that all variable are within the same log base
   prcomp()
 ```
 
-## Biplot
+### Biplot
+Create a biplot of the trends of the dependent variables, compare these dependent variable relationships to the independent variables by classifying the independent variables groups by coloring. 
 
 ```{r}
  
+caption = 'Figure 1. PCA analysis of the following nutrients: carbs (g), energy (kcal), fat (g), and protein (g). The food groups are organized by color: dairy and egg products, fast food, nut and seed products, and snacks. Food groups consist of  for 4 food groups. (USDA 2019)'
  
 autoplot(nutrients_pca,
          data = nutrients,
@@ -47,23 +53,22 @@ autoplot(nutrients_pca,
          loadings.colour = 'black',
          loadings.label.colour = 'black',
          loadings.label.vjust = -0.5) +
-  scale_color_manual(values = c('blue', 'purple', 'orange', 'red', 'green')) +
+  scale_color_manual(values = c('forestgreen', 'purple', 'orange', 'red')) +
   scale_fill_manual(values = c()) +
+  labs(title = "PCA Analysis Food Group Nutrient Content",
+       color = "Food Group",
+       caption = str_wrap(caption)) +
   theme_minimal()
 ```
 
-```{r}
-autoplot(nutrients_pca,
-         data = nutrients,
-         loadings = TRUE,
-         colour = 'food_group',
-         loadings.label = TRUE,
-         loadings.colour = 'black',
-         loadings.label.colour = 'black',
-         loadings.label.vjust = -0.5) +
-  scale_color_paletteer_d('nord::aurora') +
-  theme_minimal()
-```
+
+### PCA Analysis
+From the PCA above, we can learn the following things:
+  - grams of carbs and grams of fat have no relationship
+  - grams of fat and energy kcals are positively correlated
+  - grams of cards and grams of proteins are negatively correlated
+  - Out of all the food groups, Snacks tend to have on average the highest grams of carbs.
+  - Out of all the food groups, Nut and Seed products tend to have on average the highest grams of fat.
 
 ### Citation
  U.S. Department of Agriculture, Agricultural Research Service. FoodData Central, 2019. fdc.nal.usda.gov.
