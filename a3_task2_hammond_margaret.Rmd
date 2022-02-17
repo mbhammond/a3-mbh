@@ -30,7 +30,25 @@ library(ggdendro)
 chem_sbr <- read_csv(here('data', 'sbc_lter_registered_stream_chemistry.csv')) %>% 
   clean_names() %>% 
   na_if(-999) %>% 
-  select(-timestamp_local)
+  na.omit() %>% 
+  select(-timestamp_local) %>% 
+  group_by(site_code) %>% 
+  summarize(nh4_mean = mean(nh4_u_m),
+            tdn_mean = mean(tdn_u_m),
+            tdp_mean = mean(tdp_u_m),
+            tpc_mean = mean(tpc_u_m),
+            tpn_mean = mean(tpn_u_m),
+            tpp_mean = mean(tpp_u_m),
+            tss_mean = mean(tss_mgper_liter),
+            no3_mean = mean(no3_u_m),
+            po4_mean = mean(po4_u_m),
+            spec_cond_mean = mean(spec_cond_u_spercm))
+
+water_chem_scale <- chem_sbr %>% 
+  select(-site_code) %>% 
+  scale()
+
+rownames(water_chem_scale) <- chem_sbr$site_code
   
 ```
 
