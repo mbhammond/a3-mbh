@@ -51,7 +51,23 @@ water_chem_scale <- chem_sbr %>%
 rownames(water_chem_scale) <- chem_sbr$site_code
   
 ```
+### Agglomerative Cluster Analysis
 
+```{r}
+site_dist <- dist(water_chem_scale, method = 'euclidean') ### creates distance matrix
+
+
+hc_complete <- hclust(site_dist, method = 'complete') ### create the clustering
+
+ggdendrogram(hc_complete, rotate = TRUE) +
+  theme_minimal() +
+  labs(x = 'Site',
+       y = 'Height',
+       title = 'Santa Barbara Sites by Water Chemistry',
+       caption = 'Santa Barbara sites as clustered by chemistry levels of water 
+       (SBC LTER 2019).')
+
+```
 
 
 ### Citation
