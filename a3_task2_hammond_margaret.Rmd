@@ -61,11 +61,23 @@ hc_complete <- hclust(site_dist, method = 'complete') ### create the clustering
 
 ggdendrogram(hc_complete, rotate = TRUE) +
   theme_minimal() +
+  scale_colour_manual(values = c('red', 'blue')) +
   labs(x = 'Site',
        y = 'Height',
        title = 'Santa Barbara Sites by Water Chemistry',
        caption = 'Figure 1. Santa Barbara sites as clustered by chemistry levels of water 
-       (SBC LTER 2019).')
+       (SBC LTER 2019).') 
+
+
+
+dend <- as.dendrogram(hc_complete)
+color_branches(dend, k = 2, col = c('red', 'blue'))
+dend %>% set("branches_k_color", 
+             value = c('red', 'blue'),
+             k = 2) %>% 
+  plot(main = "Santa Barbara Sites by Water Chemistry",
+       horiz = FALSE)
+
 
 ```
 
